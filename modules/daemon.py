@@ -52,11 +52,11 @@ class Config(object):
             except ConfigParser.ParsingError:
                 print('Invalid config file!')
 
-        else:
-            pass
+        if None in [self.address, self.url]:
+            raise ValueError('Invalid configuration file! Please check example.')
 
 
 if __name__ == '__main__':
     pass
-    #config = Config()
-    #config.load()
+    config = Config()
+    config.load()
