@@ -5,15 +5,23 @@ import sys, time
 import os.path
 from modules.daemon import Daemon
 
+CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
+
 class Uploader(Daemon):
     def run(self):
 
-        #file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'uck.dat'))
+        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
         while True:
-            time.sleep(1)
+            with open(file_name, 'a') as f:
+                f.write('fuck!')
+            time.sleep(2)
+
+    def stop(self):
+        Daemon.stop(self)
+
 
 if __name__ == '__main__':
-    daemon = Uploader('/tmp/uploader.pid')
+    daemon = Uploader(CONST_UPLOADER_PID_FILE)
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             daemon.start()
