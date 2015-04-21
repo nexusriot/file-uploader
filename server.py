@@ -63,5 +63,11 @@ def daemon_restart():
     return redirect(url_for('daemon_status'))
 
 
+@app.route('/test', methods=['POST'])
+def test_post():
+    print 'path: %s, number: %s' % (request.path, request.form.get('@number'))
+    return ''
+
+
 if __name__ == '__main__':
     app.run()

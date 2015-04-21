@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys, time
+import sys
+import time
 import os.path
 from modules.daemon import Daemon
+
+from tests.poster import generate_post
+
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
@@ -12,8 +16,10 @@ class Uploader(Daemon):
 
         file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
         while True:
+
+            status, reason = generate_post()
             with open(file_name, 'a') as f:
-                f.write('fuck!')
+                f.write('%d %s;' % (status, reason))
             time.sleep(2)
 
     def stop(self):
