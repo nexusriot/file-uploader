@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import subprocess
 import os
+import time
 import os.path
 from datetime import datetime
 import ConfigParser
@@ -23,20 +25,41 @@ def get_or_abort(model, object_id, code=404):
 
 @app.route('/')
 def index():
-    return 'Index'
+    return redirect(url_for('daemon_status'))
+
 
 @app.route('/daemon/status')
 def daemon_status():
     if os.path.isfile(CONST_UPLOADER_PID_FILE):
         pf = open(CONST_UPLOADER_PID_FILE, 'r')
         pid = pf.read().strip()
-        return 'Daemon is running. PID is %s' % (pid)
+        message = 'Daemon is running. PID is %s' % pid
     else:
-        return 'Daemon is not running...'
+        message = 'Daemon is not running...'
+    return render_template('index.html', message=message)
 
 
 @app.route('/daemon/start')
-def daemon_start_command():
+def daemon_start():
+    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'start']
+    subprocess.Popen(cmd)
+    time.sleep(0.5)
+    return redirect(url_for('daemon_status'))
+
+
+@app.route('/daemon/stop')
+def daemon_stop():
+    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'stop']
+    subprocess.Popen(cmd)
+    time.sleep(0.5)
+    return redirect(url_for('daemon_status'))
+
+
+@app.route('/daemon/restart')
+def daemon_restart():
+    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'restart']
+    subprocess.Popen(cmd)
+    time.sleep(0.5)
     return redirect(url_for('daemon_status'))
 
 
