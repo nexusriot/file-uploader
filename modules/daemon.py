@@ -1,62 +1,112 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
-import os.path
-import ConfigParser
+import sys, os, time, atexit
+from signal import SIGTERM
 
 
-# Configuration singleton
-class Config(object):
-    _instance = None
+class Daemon:
+    """
+    Daemon
 
-    address = None
-    url = None
+    """
+    def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+        self.stdin = stdin
+        self.stdout = stdout
+        self.stderr = stderr
+        self.pidfile = pidfile
 
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(Config, cls).__new__(
-                cls, *args, **kwargs)
-        return cls._instance
+    def daemonize(self):
+        try:
+            pid = os.fork()
+            if pid > 0:
+                sys.exit(0)
+        except OSError, e:
+            sys.stderr.write("fork #1 failed %d (%s)\n" % (e.errno, e.strerror))
+            sys.exit(1)
+        os.chdir('/')
+        os.setsid()
+        os.umask(0)
 
-    def load(self):
-        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'daemon.cfg'))
+        try:
+            pid = os.fork()
+            if pid > 0:
+                sys.exit(0)
+        except OSError, e:
+            sys.stderr.write("fork #2 failed %d (%s)\n" % (e.errno, e.strerror))
+            sys.exit(1)
 
-        if os.path.isfile(file_name):
-            cfg = ConfigParser.ConfigParser()
-            try:
-                cfg.read(file_name)
-                matches= [x for x in ['server', 'upload'] if x in cfg.sections()]
-                for match in matches:
-                    if match == 'server':
-                        try:
-                            server_address = cfg.get(match, 'address')
-                            self.address = server_address
-                        except ConfigParser.NoOptionError:
-                            print('Required server option address is missing!')
-                    elif match == 'upload':
-                        try:
-                            upload_url = cfg.get(match, 'url')
-                            url_template = ('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
-                                            '(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-                            if re.match(url_template, upload_url):
-                                self.url = upload_url
-                            else:
-                                raise ValueError('Invalid url')
-
-                        except ConfigParser.NoOptionError:
-                            print('Required upload option url is missing!')
-                        except ValueError:
-                            print ('Invalid url, please configure correct one!')
-
-            except ConfigParser.ParsingError:
-                print('Invalid config file!')
-
-        if None in [self.address, self.url]:
-            raise ValueError('Invalid configuration file! Please check example.')
+        sys.stderr.flush()
+        sys.stdout.flush()
+        si = file(self.stdin, 'r')
+        so = file(self.stdout, 'a+')
+        se = file(self.stderr, 'a+', 0)
+        os.dup2(si.fileno(), sys.stdin.fileno())
+        os.dup2(so.fileno(), sys.stdout.fileno())
+        os.dup2(se.fileno(), sys.stderr.fileno())
 
 
-if __name__ == '__main__':
-    pass
-    config = Config()
-    config.load()
+        atexit.register(self.delpid)
+        pid = str(os.getpid())
+        file(self.pidfile, 'w+').write("%s\n" % pid)
+
+    def delpid(self):
+        """
+        delete pid file
+        """
+        os.remove(self.pidfile)
+
+    def start(self):
+        """
+        Start the daemon !!!1
+        """
+        try:
+            pf = file(self.pidfile, 'r')
+            pid = int(pf.read().strip())
+            pf.close()
+        except IOError:
+            pid = None
+
+        if pid:
+            message = "pidfile %s already exsist. Daemon possible already running\n"
+            sys.stderr.write(message % self.pidfile)
+            sys.exit(1)
+
+        self.daemonize()
+        self.run()
+
+    def stop(self):
+        try:
+            pf = file(self.pidfile, 'r')
+            pid = int(pf.read().strip())
+            pf.close()
+        except IOError:
+            pid = None
+
+        if not pid:
+            message = "pidfile %s does not exist. Daemon not running \n"
+            sys.stderr.write(message % self.pidfile)
+            return
+
+        try:
+            while 1:
+                os.kill(pid, SIGTERM)
+                time.sleep(0.1)
+
+        except OSError, err:
+            err = str(err)
+            if err.find('No such process') > 0:
+                if os.path.exists(self.pidfile):
+                    os.remove(self.pidfile)
+                else:
+                    print str(err)
+                    sys.exit(1)
+
+    def restart(self):
+        self.stop()
+        self.start()
+
+    def run(self):
+        """
+        override me :)
+        """
