@@ -1,36 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import httplib, urllib, urllib2, os
-
-# TODO: Is poster really needed?
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
+import urllib
+import os
+import requests
 
 
 def post():
-    params = urllib.urlencode({'@number': 12345, '@type': 'issue', '@action': 'show'})
-    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-    conn = httplib.HTTPConnection("localhost", 5000)
-    conn.request("POST", '/test', params, headers)
-    response = conn.getresponse()
-    return response.status, response.reason
+    payload = {'@number': 12345}
+    r = requests.post('http://localhost:5000/test', data=payload)
+    return r.status_code
 
 
 def post_multipart():
-    register_openers()
-    filename = 'testfile'
+    payload = {'@number': 1}
     url = 'http://localhost:5000/test'
-    values = {'form': open(filename), 'desc': 'description'}
-    data, headers = multipart_encode(values)
-    headers['User-Agent'] = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-    request = urllib2.Request(url, data, headers)
-    request.unverifiable = True
-    response = urllib2.urlopen(request)
-    page = response.read()
+    files = {'file': open(os.path.abspath(os.path.join(os.path.dirname(__file__), 'testfile')), 'rb')}
+    r = requests.post(url, files=files, data=payload)
+    return r.status_code
 
 
 def main():
+    post()
     post_multipart()
 
 

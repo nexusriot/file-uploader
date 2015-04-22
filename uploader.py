@@ -7,19 +7,20 @@ import os.path
 from modules.daemon import Daemon
 
 from tests.post import post, post_multipart
-
+import requests
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
+
 
 class Uploader(Daemon):
     def run(self):
 
         file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
         while True:
-            status, reason = post()
-            #result = post_multipart()
+            status_code = post_multipart()
             with open(file_name, 'a') as f:
-                f.write('%s;' % (str(status)))
+                pass
+                f.write('%s;' % (str(status_code)))
             time.sleep(2)
 
     def stop(self):
