@@ -15,12 +15,12 @@ CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 class Uploader(Daemon):
     def run(self):
 
-        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
+        #file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
         while True:
             status_code = post_multipart()
-            with open(file_name, 'a') as f:
-                pass
-                f.write('%s;' % (str(status_code)))
+            status_code = post()
+            #with open(file_name, 'a') as f:
+            #    f.write('%s;' % (str(status_code)))
             time.sleep(2)
 
     def stop(self):

@@ -65,8 +65,13 @@ def daemon_restart():
 
 @app.route('/test', methods=['POST'])
 def test_post():
-    print 'path: %s, number: %s' % (request.path, request.form.get('@number'))
-    return ''
+    if request.files.get('file'):
+        file_name = request.files['file'].filename
+        blob = request.files['file'].read()
+        size = len(blob)
+        print ('file in POST: %s, size: %d ' % (file_name, size))
+    print ('path: %s, number: %s' % (request.path, request.form.get('@number')))
+    return 'OK'
 
 
 if __name__ == '__main__':
