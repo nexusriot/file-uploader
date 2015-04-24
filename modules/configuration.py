@@ -14,6 +14,8 @@ class Configuration(object):
 
     address = None
     url = None
+    interpreter = None
+    api_key = None
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -28,7 +30,7 @@ class Configuration(object):
             cfg = ConfigParser.ConfigParser()
             try:
                 cfg.read(file_name)
-                matches= [x for x in ['server', 'upload'] if x in cfg.sections()]
+                matches=[x for x in ['server', 'upload', 'python'] if x in cfg.sections()]
                 for match in matches:
                     if match == 'server':
                         try:
@@ -50,11 +52,22 @@ class Configuration(object):
                             print('Required upload option url is missing!')
                         except ValueError:
                             print ('Invalid url, please configure correct one!')
+                        try:
+                            api_key = cfg.get(match, 'api_key')
+                            self.api_key = api_key
+                        except ConfigParser.NoOptionError:
+                            print ("Required option api_key is missing!")
 
+                    elif match == 'python':
+                        try:
+                            interpreter = cfg.get(match, 'interpreter')
+                            self.interpreter = interpreter
+                        except ConfigParser.NoOptionError:
+                            print('Interpreter name required!')
             except ConfigParser.ParsingError:
                 print('Invalid config file!')
 
-        if None in [self.address, self.url]:
+        if None in [self.address, self.url, self.interpreter, self.api_key]:
             raise ValueError('Invalid configuration file! Please check example.')
 
     def save(self):
@@ -64,7 +77,8 @@ class Configuration(object):
 def main():
     configuration = Configuration()
     configuration.load()
-    print configuration.url
+    print "url: %s, api_key: %s" % (configuration.url, configuration.api_key)
+
 
 if __name__ == '__main__':
     main()
