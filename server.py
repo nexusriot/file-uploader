@@ -46,6 +46,7 @@ class Event(db.Model):
 
     def __init__(self, name, date, file_size, file_attrs, file_timestamp, operation_code):
         self.name = name
+
         if date is None:
             date = datetime.utcnow()
         self.date = date
@@ -55,7 +56,7 @@ class Event(db.Model):
         self.operation_code = operation_code
 
     def __repr__(self):
-        return '<Event %d>' % self.id
+        return '<Event #%d (%s)>' % (self.id, self.date.strftime('%Y %m %d %H:%M:%S'))
 
 
 @app.route('/')
