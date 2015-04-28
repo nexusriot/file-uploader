@@ -5,7 +5,7 @@ import os
 import requests
 
 
-def post_regular(url='http://localhost:5000/test', payload={'@number': 12345}):
+def post(url='http://localhost:5000/test', payload={'@number': 12345}):
     code = 0
     try:
         r = requests.post(url, data=payload)
@@ -32,7 +32,7 @@ def post_multipart(url='http://localhost:5000/test', payload={'@number': 1},
 
 
 def main():
-    print (post_regular())
+    print (post())
     print (post_multipart())
 
 
