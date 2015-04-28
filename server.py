@@ -23,6 +23,41 @@ def get_or_abort(model, object_id, code=404):
     return result or abort(code)
 
 
+class EventType(db.Model):
+    __tablename__ = 'event_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<Event type %d (%s)>' % (self.id, self.name)
+
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), unique=False)
+    date = db.Column(db.DateTime)
+    file_size = db.Column(db.String(32), unique=False)
+    file_attrs = db.Column(db.String(128), unique=False)
+    file_timestamp = db.Column(db.String(32), unique=False)
+    operation_code = db.Column(db.Integer)
+
+    def __init__(self, name, date, file_size, file_attrs, file_timestamp, operation_code):
+        self.name = name
+        if date is None:
+            date = datetime.utcnow()
+        self.date = date
+        self.file_size = file_size
+        self.file_attrs = file_attrs
+        self.file_timestamp = file_timestamp
+        self.operation_code = operation_code
+
+    def __repr__(self):
+        return '<Event %d>' % self.id
+
+
 @app.route('/')
 def index():
     return redirect(url_for('daemon_status'))

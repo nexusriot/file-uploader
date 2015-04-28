@@ -5,9 +5,8 @@ import sys
 import time
 import os.path
 from modules.daemon import Daemon
+from tests.post import post_regular, post_multipart
 
-from tests.post import post, post_multipart
-import requests
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
@@ -18,7 +17,7 @@ class Uploader(Daemon):
         #file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
         while True:
             status_code = post_multipart()
-            status_code = post()
+            status_code = post_regular()
             #with open(file_name, 'a') as f:
             #    f.write('%s;' % (str(status_code)))
             time.sleep(2)

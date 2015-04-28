@@ -71,13 +71,18 @@ class Configuration(object):
             raise ValueError('Invalid configuration file! Please check example.')
 
     def save(self):
-        pass
+        raise NotImplementedError
 
 
 def main():
     configuration = Configuration()
     configuration.load()
-    print "url: %s, api_key: %s" % (configuration.url, configuration.api_key)
+    print ("url: %s, api_key: %s, interpreter: %s" %
+           (configuration.url, configuration.api_key, configuration.interpreter))
+    try:
+        configuration.save()
+    except NotImplementedError, e:
+        print("NotImplementedError catched ")
 
 
 if __name__ == '__main__':
