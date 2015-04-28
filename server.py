@@ -43,13 +43,16 @@ class Event(db.Model):
     file_attrs = db.Column(db.String(128), unique=False)
     file_timestamp = db.Column(db.String(32), unique=False)
     operation_code = db.Column(db.Integer)
+    event_type_id = db.Column(db.Integer, db.ForeignKey('event_type.id'))
+    event_type = db.relationship('EventType', backref=db.backref('events', lazy='dynamic'))
 
-    def __init__(self, name, date, file_size, file_attrs, file_timestamp, operation_code):
+    def __init__(self, name, event_type,  date, file_size, file_attrs, file_timestamp, operation_code):
         self.name = name
 
         if date is None:
             date = datetime.utcnow()
         self.date = date
+        self.event_type = event_type
         self.file_size = file_size
         self.file_attrs = file_attrs
         self.file_timestamp = file_timestamp
