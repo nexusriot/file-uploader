@@ -3,17 +3,24 @@
 
 import sys
 import time
+import datetime
 import os.path
 from modules.daemon import Daemon
+
+from server import db, EventType, Event
 from uploader_tests.post import post, post_multipart
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
 
+def file_log(filename, message):
+    with open(filename, 'a') as f:
+        f.write('%s %s' % (message,  datetime.datetime.now().strftime('%Y %m %d %H:%M:%S')))
+
+
 class Uploader(Daemon):
     def run(self):
-
-        #file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuck.dat'))
+        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuckup.dat'))
         while True:
             status_code = post_multipart()
             status_code = post()
