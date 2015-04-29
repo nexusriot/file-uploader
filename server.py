@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import subprocess
 import os
 import time
@@ -113,5 +114,26 @@ def test_post():
     return 'OK'
 
 
+def init():
+    db.create_all()
+    db.session.add(EventType(u'Information'))
+    db.session.add(EventType(u'Error'))
+    db.session.add(EventType(u'File uploading'))
+    db.session.add(EventType(u'File changed'))
+    db.session.commit()
+
+
 if __name__ == '__main__':
-    app.run()
+# TODO: Optparse maybe?
+    if len(sys.argv) == 2:
+        if 'init' == sys.argv[1]:
+            init()
+        else:
+            print 'unknown command!'
+            sys.exit(2)
+
+    elif len(sys.argv) == 1:
+        app.run()
+    else:
+        print('usage: %s [init]' % sys.argv[0])
+        sys.exit(2)
