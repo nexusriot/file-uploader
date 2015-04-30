@@ -13,7 +13,7 @@ from server import (CONST_UPLOADER_PID_FILE, db, EventType, Event)
 
 def file_log(filename, message):
     with open(filename, 'a') as f:
-        f.write('%s %s' % (message,  datetime.datetime.now().strftime('%Y %m %d %H:%M:%S')))
+        f.write('%s %s\n' % (datetime.datetime.now().strftime('%Y %m %d %H:%M:%S'), message))
 
 
 class Uploader(Daemon):
