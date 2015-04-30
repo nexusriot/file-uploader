@@ -7,10 +7,8 @@ import datetime
 import os.path
 from modules.daemon import Daemon
 
-from server import db, EventType, Event
 from uploader_tests.post import post, post_multipart
-
-CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
+from server import (CONST_UPLOADER_PID_FILE, db, EventType, Event)
 
 
 def file_log(filename, message):
@@ -20,7 +18,7 @@ def file_log(filename, message):
 
 class Uploader(Daemon):
     def run(self):
-        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuckup.dat'))
+        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuckup.log'))
         while True:
             status_code = post_multipart()
             status_code = post()

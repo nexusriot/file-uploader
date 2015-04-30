@@ -12,7 +12,7 @@ import ConfigParser
 from flask import Flask, render_template, request, redirect, url_for, abort
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from uploader import CONST_UPLOADER_PID_FILE
+CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
 app = Flask(__name__)
 app.config.from_pyfile('server.cfg')
