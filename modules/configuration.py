@@ -70,6 +70,8 @@ class Configuration(object):
         if None in [self.address, self.url, self.interpreter, self.api_key]:
             raise ValueError('Invalid configuration file! Please check example.')
 
+        return {'address': self.address, 'url': self.url, 'interpreter': self.interpreter, 'api_key': self.api_key}
+
     def save(self):
         raise NotImplementedError
 

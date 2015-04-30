@@ -6,6 +6,7 @@ import time
 import datetime
 import os.path
 from modules.daemon import Daemon
+from modules.configuration import Configuration
 
 from uploader_tests.post import post, post_multipart
 from server import (CONST_UPLOADER_PID_FILE, db, EventType, Event)
@@ -20,11 +21,13 @@ class Uploader(Daemon):
     def run(self):
         file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuckup.log'))
         while True:
-            status_code = post_multipart()
-            status_code = post()
-            #with open(file_name, 'a') as f:
-            #    f.write('%s;' % (str(status_code)))
-            time.sleep(2)
+            ### step1: get configuration
+            config = Configuration().load()
+
+
+            #status_code = post_multipart()
+            #status_code = post()
+            time.sleep(20)
 
     def stop(self):
         Daemon.stop(self)
