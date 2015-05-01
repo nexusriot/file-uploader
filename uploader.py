@@ -23,6 +23,11 @@ class Uploader(Daemon):
         while True:
             ### step1: get configuration
             config = Configuration().load()
+            ### step2: then check the file for post
+            # TODO: get last from log?
+            # if date of local file < remote, post the file
+
+
 
 
             #status_code = post_multipart()
