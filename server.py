@@ -10,7 +10,7 @@ from datetime import datetime
 import ConfigParser
 
 from flask import Flask, render_template, request, redirect, url_for, abort
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy, event
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
@@ -49,6 +49,12 @@ class File(db.Model):
         if date_inserted is None:
             self.date_inserted = datetime.utcnow()
         self.timestamp = timestamp
+
+
+@event.listens_for(File.name, 'append')
+def receive_append(target, value, initiator):
+    pass
+    #target.date_inserted = datetime.utcnow()
 
 
 class Event(db.Model):
