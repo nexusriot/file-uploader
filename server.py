@@ -36,28 +36,42 @@ class EventType(db.Model):
         return '<Event type %d (%s)>' % (self.id, self.name)
 
 
+class File(db.Model):
+    __tablename__ = 'file'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), unique=True)
+    date_inserted = db.Column(db.DateTime)
+    timestamp = db.Column(db.Integer)
+
+    def __init__(self, name, date_inserted, timestamp):
+        self.name = name
+
+        if date_inserted is None:
+            self.date_inserted = datetime.utcnow()
+        self.timestamp = timestamp
+
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=False)
     date = db.Column(db.DateTime)
-    file_size = db.Column(db.String(32), unique=False)
     file_attrs = db.Column(db.String(128), unique=False)
-    file_timestamp = db.Column(db.String(32), unique=False)
-    operation_code = db.Column(db.Integer)
+    result_code = db.Column(db.Integer)
     event_type_id = db.Column(db.Integer, db.ForeignKey('event_type.id'))
     event_type = db.relationship('EventType', backref=db.backref('events', lazy='dynamic'))
+    file_id = db.Column(db.Integer, db.ForeignKey('file.id'))
+    file = db.relationship('File', backref=db.backref('files', lazy='dynamic'))
 
-    def __init__(self, name, event_type,  date, file_size, file_attrs, file_timestamp, operation_code):
+    def __init__(self, name, event_type, file, date, file_attrs, result_code):
         self.name = name
 
         if date is None:
             date = datetime.utcnow()
         self.date = date
         self.event_type = event_type
-        self.file_size = file_size
+        self.file = file
         self.file_attrs = file_attrs
-        self.file_timestamp = file_timestamp
-        self.operation_code = operation_code
+        self.result_code = result_code
 
     def __repr__(self):
         return '<Event #%d (%s)>' % (self.id, self.date.strftime('%Y %m %d %H:%M:%S'))
