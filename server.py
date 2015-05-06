@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from sqlalchemy.orm.session import object_session
 
 import sys
 import subprocess
@@ -40,21 +41,21 @@ class File(db.Model):
     __tablename__ = 'file'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=True)
-    date_inserted = db.Column(db.DateTime)
+    inserted_at = db.Column(db.DateTime)
+    updated_at = db.Column(db.DateTime)
     timestamp = db.Column(db.Integer)
 
-    def __init__(self, name, date_inserted, timestamp):
+    def __init__(self, name, timestamp, inserted_at=None):
         self.name = name
 
-        if date_inserted is None:
-            self.date_inserted = datetime.utcnow()
+        if inserted_at is None:
+            self.inserted_at = datetime.utcnow()
         self.timestamp = timestamp
 
 
-@event.listens_for(File.name, 'append')
-def receive_append(target, value, initiator):
-    pass
-    #target.date_inserted = datetime.utcnow()
+@event.listens_for(File, 'after_update')
+def update_actual_date(mapper, connection, target):
+    target.updated_at = datetime.utcnow()
 
 
 class Event(db.Model):

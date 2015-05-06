@@ -32,7 +32,7 @@ class Configuration(object):
             cfg = ConfigParser.ConfigParser()
             try:
                 cfg.read(file_name)
-                matches=[x for x in ['server', 'upload', 'python'] if x in cfg.sections()]
+                matches = [x for x in ['server', 'upload', 'python'] if x in cfg.sections()]
                 for match in matches:
                     if match == 'server':
                         try:
