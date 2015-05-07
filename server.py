@@ -58,6 +58,16 @@ def update_actual_date(mapper, connection, target):
     target.updated_at = datetime.utcnow()
 
 
+def get_file_object_or_create(file_name):
+    file= File.query.filter_by(name=file_name).first()
+    if file:
+        file.updated_at = datetime.utcnow()
+        return file
+    else:
+        return File(name=file_name, timestamp=None, inserted_at=None)
+
+
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=False)
