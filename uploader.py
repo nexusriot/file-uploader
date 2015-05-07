@@ -26,10 +26,6 @@ class Uploader(Daemon):
             ### step2: then check the file for post
             # TODO: get last from log?
             # if date of local file < remote, post the file
-
-
-
-
             #status_code = post_multipart()
             #status_code = post()
             time.sleep(20)
