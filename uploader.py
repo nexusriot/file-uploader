@@ -3,32 +3,57 @@
 
 import sys
 import time
-import datetime
+from datetime import datetime
 import os.path
 from modules.daemon import Daemon
 from modules.configuration import Configuration
 
-from uploader_tests.post import post, post_multipart
-from server import (CONST_UPLOADER_PID_FILE, db, EventType, Event)
+from server import (CONST_UPLOADER_PID_FILE, db, EventType, Event, get_file_object_or_create)
+from modules.utils import get_file_info, get_file_names
+from modules.post import post_multipart
 
 
 def file_log(filename, message):
     with open(filename, 'a') as f:
-        f.write('%s %s\n' % (datetime.datetime.now().strftime('%Y %m %d %H:%M:%S'), message))
+        f.write('%s %s\n' % (datetime.now().strftime('%Y %m %d %H:%M:%S'), message))
 
 
 class Uploader(Daemon):
     def run(self):
         file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fuckup.log'))
         while True:
+
             ### step1: get configuration
             config = Configuration().load()
-            ### step2: then check the file for post
-            # TODO: get last from log?
-            # if date of local file < remote, post the file
-            #status_code = post_multipart()
-            #status_code = post()
+            path = config.get('upload_folder')
+            if path:
+                for file_name in get_file_names(path):
+                    file_changed = False
+                    result = None
+                    f = os.path.basename(file_name)
+                    file_object = get_file_object_or_create(f)
+                    current_file_info = get_file_info(file_name)
+                    current_file_timestamp = current_file_info[0].replace('-', '').replace(':', '').replace(' ', '')
+                    # file exist
+                    if file_object.timestamp:
+                        if file_object.timestamp < current_file_timestamp:
+                            file_changed = True
+                            # Do POST
+
+                            #if 200
+                            file_object.updated_at = datetime.utcnow()
+                            file_object.timestamp = current_file_timestamp
+                            ##
+                    else:
+                        # Do POST
+                        # if 200
+                        file_object.updated_at = datetime.utcnow()
+                        file_object.timestamp = current_file_timestamp
+                        file_changed = True
+                    db.session.add(file_object)
+                    db.session.commit()
             time.sleep(20)
+
 
     def stop(self):
         Daemon.stop(self)
