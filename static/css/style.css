@@ -1,0 +1,16 @@
+h3 {
+    margin: 10px;
+}
+
+table {
+    margin: 10px;
+}
+
+table tr th{
+    padding: 5px;
+    font-style: oblique;
+}
+
+table tr td{
+    padding: 3px;
+}

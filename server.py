@@ -61,7 +61,6 @@ def update_actual_date(mapper, connection, target):
 def get_file_object_or_create(file_name):
     file= File.query.filter_by(name=file_name).first()
     if file:
-        file.updated_at = datetime.utcnow()
         return file
     else:
         return File(name=file_name, timestamp=None, inserted_at=None)
@@ -107,7 +106,9 @@ def daemon_status():
         message = 'Daemon is running. PID is %s' % pid
     else:
         message = 'Daemon is not running...'
-    return render_template('index.html', message=message)
+    files = File.query.all()
+    events = Event.query.order_by('date desc').all()[:50]
+    return render_template('index.html', message=message, files=files, events=events)
 
 
 @app.route('/daemon/start')

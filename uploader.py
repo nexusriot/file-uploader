@@ -145,7 +145,7 @@ class Uploader(Daemon):
                     current_file_timestamp = current_file_info[0].replace('-', '').replace(':', '').replace(' ', '')
                     #file exist
                     if file_object.timestamp:
-                        if file_object.timestamp < current_file_timestamp:
+                        if int(file_object.timestamp) < int(current_file_timestamp):
                             file_changed = True
                             upload_file(file_name, file_object, current_file_timestamp)
                     else:
