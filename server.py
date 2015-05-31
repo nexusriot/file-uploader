@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm.session import object_session
 
 import sys
 import subprocess
@@ -8,10 +7,11 @@ import os
 import time
 import os.path
 from datetime import datetime
-import ConfigParser
 
 from flask import Flask, render_template, request, redirect, url_for, abort
 from flask.ext.sqlalchemy import SQLAlchemy, event
+
+from modules.configuration import Configuration
 
 CONST_UPLOADER_PID_FILE = '/tmp/uploader.pid'
 
@@ -112,7 +112,9 @@ def daemon_status():
 
 @app.route('/daemon/start')
 def daemon_start():
-    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'start']
+    config = Configuration()
+    config.load()
+    cmd = [config.interpreter, os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'start']
     subprocess.Popen(cmd)
     time.sleep(0.5)
     return redirect(url_for('daemon_status'))
@@ -120,7 +122,9 @@ def daemon_start():
 
 @app.route('/daemon/stop')
 def daemon_stop():
-    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'stop']
+    config = Configuration()
+    config.load()
+    cmd = [config.interpreter, os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'stop']
     subprocess.Popen(cmd)
     time.sleep(0.5)
     return redirect(url_for('daemon_status'))
@@ -128,7 +132,9 @@ def daemon_stop():
 
 @app.route('/daemon/restart')
 def daemon_restart():
-    cmd = ['/usr/bin/env', 'python', os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'restart']
+    config = Configuration()
+    config.load()
+    cmd = [config.interpreter, os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploader.py')), 'restart']
     subprocess.Popen(cmd)
     time.sleep(0.5)
     return redirect(url_for('daemon_status'))

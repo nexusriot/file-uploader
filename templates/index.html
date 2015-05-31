@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Uploader Daemon control panel</title>
 </head>
 <body>
 {{message}}
-<a href="{{ url_for('daemon_start') }}">Start Daemon</a>
-<a href="{{ url_for('daemon_stop') }}">Stop Daemon</a>
+<a href="{{ url_for('daemon_start') }}">Start Daemon</a> ||
+<a href="{{ url_for('daemon_stop') }}">Stop Daemon</a> ||
 <a href="{{ url_for('daemon_restart') }}">Restart Daemon</a>
+<br>
 
 </body>
 </html>
