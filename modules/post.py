@@ -13,13 +13,18 @@ def post(url, payload):
 
 
 def post_multipart(url, payload, file_name):
+    response = None
     try:
         files = {'upload': open(file_name, 'rb')}
         try:
             r = requests.post(url, files=files, data=payload, verify=False)
             code = r.status_code
+            response = r.text
         except requests.exceptions.ConnectionError as e:
             code = e.args[0].reason.errno
+            response = 'connection error'
     except IOError:
         code = -1
-    return code, r.text
+        response = 'I/O error'
+
+    return code, response
